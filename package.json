@@ -1,0 +1,28 @@
+{
+  "name": "typemon",
+  "version": "1.0.0",
+  "description": "A NodeJS module for checking or specifying a type of argument or instances.",
+  "main": "./src/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PantheraRed/typemon.git"
+  },
+  "keywords": [
+    "args",
+    "types",
+    "instances",
+    "checker"
+  ],
+  "author": "PantheraRed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PantheraRed/typemon/issues"
+  },
+  "homepage": "https://github.com/PantheraRed/typemon#readme",
+  "engines": {
+    "node": ">=12.x"
+  }
+}

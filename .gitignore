@@ -1,0 +1,10 @@
+# Modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Miscellaneous
+package-lock.json
+.DS_Store
