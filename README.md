@@ -1,152 +1,442 @@
-# Typemon
+<div align="center">
+  <p>
+    <a href="https://www.npmjs.com/package/typemon"><img src="./src/assets/logo.svg" width="500" alt="typemon" /></a>
+  </p>
+  <p>
+    <a href="https://www.npmjs.com/package/typemon"><img src="https://img.shields.io/npm/v/typemon.svg?maxAge=3600" alt="npm version" /></a>
+    <a href="https://www.npmjs.com/package/typemon"><img src="https://img.shields.io/npm/dt/typemon.svg?maxAge=3600" alt="npm downloads" /></a>
+  </p>
+  <p>
+    <a href="https://nodei.co/npm/typemon/"><img src="https://nodei.co/npm/typemon.png?downloads=true&stars=true" alt="npm info" /></a>
+  </p>
+</div>
 
-A NodeJS module for checking or specifying a type of argument or instances.
+# Table of Contents
 
-### Installation
+- [About](#about)
+- [Installation](#installation)
+  - [Requirements](#requirements)
+- [Usage](#usage)
+  - [type](#type)
+  - [whatis](#whatis)
+  - [ERR_INVALID_ARG_TYPE](#err_invalid_arg_type)
+  - [check](#check)
+  - [statement](#statement)
+  - [bindChecker](#bindchecker)
+- [License](#license)
+- [Quick Links](#quick_links)
 
+# About
+
+A NodeJS module for checking or specifying types & instances of any argument.
+
+# Installation
+
+`npm install typemon`
+
+### Requirements
+
+- **Node.js:** `v14 or above`
+
+# Usage
+
+### type
+
+The type function returns type of any object. It returns an additional type "null" for object [`null`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null).
+
+```js
+type(object);
 ```
-npm install typemon
-```
 
-### About
+#### Arguments
 
-Typemon is short for "type monster". A module comprising of functions that can be used for specifying or checking types & instances of any argument. Module's main file is `./src/index.js`. `index.js` contains `bindChecker`, `check`, `sort`, `statement`, `type`, `ERR_INVALID_ARG_TYPE` & a hidden property `version`.
+- ##### object\<Any>
+  The object to get type of.
 
-### Usage
+#### Examples
 
-We'll be going through examples for each of the following functions. Note that some of these are irrelevant to checking or specifying types & instances.
-
-#### type(obj)
-
-It returns type of any object passed as an argument (only common types except null). Since typeof operator does not resolve null object. It would make sense to have your own type function to resolve this problem.
+The examples below show the basic usage.
 
 ```js
 const { type } = require("typemon");
 
-type(undefined); // returns "undefined"
-type(); // returns "undefined" since arg is undefined
+type(); // Returns "undefined"
+type(undefined); // Returns "undefined"
 
-type(null); // returns "null"
-type(true); // returns "boolean"
-type(0); // returns "number"
-type(0n); // returns "bigint"
-type(""); // returns "string"
-type(Symbol()); // returns "symbol"
-type(() => {}); // returns "function"
-type({}); // returns "object"
+type(null); // Returns "null"
+type(true); // Returns "boolean"
+type(0); // Returns "number"
+type(0n); // Returns "bigint"
+type(""); // Returns "string"
+type(Symbol()); // Returns "symbol"
+type(() => {}); // Returns "function"
+type({}); // Returns "object"
 ```
 
-#### ERR_INVALID_ARG_TYPE(arg, type, obj[, cb])
+### whatis
 
-I'll be including this one after type since it is a class that extends Error which is used in other functions as custom error.
+The whatis function generates dynamic object statements for any object passed as an argument.
 
-It is essential in creating dynamic error statements by providing "arg", "type" & "obj" arguments. "cb" which is short for callback is an optional argument since it's usage is only when "obj" statement has to be altered.
+```js
+whatis(object);
+```
+
+#### Arguments
+
+- ##### object\<Any>
+  The object to get statement of.
+
+#### Examples
+
+The examples below show the basic usage.
+
+```js
+const { whatis } = require("typemon");
+
+whatis(); // Returns "undefined"
+whatis(undefined); // Returns "undefined"
+whatis(null); // Returns "null"
+
+whatis(""); // Returns "type string ('')"
+whatis(true); // Returns "type boolean (true)"
+whatis(0); // Returns "type number (0)"
+
+whatis(() => {}); // Returns "type function (anonymous)"
+whatis([]); // Returns "an instance of Array"
+whatis(/(?:)/); // Returns "an instance of RegExp"
+```
+
+### ERR_INVALID_ARG_TYPE
+
+The class `ERR_INVALID_ARG_TYPE` extends [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error). It generates dynamic error messages.
+
+```js
+new ERR_INVALID_ARG_TYPE(argument, statement, object[, callback]);
+```
+
+#### Arguments
+
+- ##### name\<[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>
+  The name of argument.
+- ##### statement\<[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>
+  The statement specifying required type or instance.
+- ##### object\<Any>
+  The target object.
+- ##### callback\<[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function)>
+  The callback argument is optional. The `object` argument is passed as an argument. Default callback:
+
+  ```js
+  x => whatis(x);
+  ```
+
+  [<img src="./src/assets/go_to.svg" width="16" /> whatis](#whatis)
+
+#### Examples
+
+If arguments `name`, `statement` or `callback` are of invalid types, class will throw [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError).
 
 ```js
 const { ERR_INVALID_ARG_TYPE } = require("typemon");
 
 try {
-  const x = true;
-
-  // Case 1:
-  throw new ERR_INVALID_ARG_TYPE("x", "of type string", x);
-
-  // Case 2:
-  throw new ERR_INVALID_ARG_TYPE("x", "of type string", null, () => "true");
-
-  // Case 3:
-  throw new ERR_INVALID_ARG_TYPE();
+  throw new ERR_INVALID_ARG_TYPE(); // Throws an error
 } catch (err) {
-  console.error(err + "");
-
-  // Case 1:
-  // TypeError [ERR_INVALID_ARG_TYPE]: The "x" argument must be of type string. Received boolean (true)
-
-  // Case 2:
-  // TypeError [ERR_INVALID_ARG_TYPE]: The "x" argument must be of type string. Received true
-
-  // Case 3:
-  // TypeError [ERR_INVALID_ARG_TYPE]: The "undefined" argument must be undefined. Received undefined
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "name" argument must be of type string. Received undefined
 }
 ```
 
-#### sort(arr)
-
-This one is irrelevant since it sorts out non-string & empty string values from an array.
+The examples below show the basic usage.
 
 ```js
-const { sort } = require("typemon");
+const { ERR_INVALID_ARG_TYPE } = require("typemon");
 
-sort(); // will throw TypeError since "arr" argument is undefined
+function example(str) {
+  if (typeof str !== "string") {
+    throw new ERR_INVALID_ARG_TYPE("str", "of type string", str);
+  }
 
-sort([]); // returns []
-sort([0, "", "Hello World!"]); // returns ["Hello World!"]
+  return str.toLowerCase();
+}
+
+try {
+  example("HELLO WORLD!"); // Returns "hello world!"
+  example(0); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "str" argument must be of type string. Received type number (0)
+}
 ```
 
-#### check(refs, val)
+Since, it offers a `callback`, the "received" object statements can be altered.
 
-It checks type of any object passed as an argument against the array of string values containing type or instance name (references) & returns boolean. Note that instances are checked against constructor's name.
+```js
+const { ERR_INVALID_ARG_TYPE } = require("typemon");
+
+function example(str) {
+  if (!str.length) {
+    throw new ERR_INVALID_ARG_TYPE("str", "a non-empty string", null, () => "an empty string");
+  }
+
+  return str.toLowerCase();
+}
+
+try {
+  example("HELLO WORLD!"); // Returns "hello world!"
+  example(""); // Throws an error
+} catch (err) {
+  console.error(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "str" argument must be a non-empty string. Received an empty string
+}
+```
+
+### check
+
+The check function checks whether or not type or instance name of object matches a type or instance name from array of strings containing type & instance names collectively known as `references`.
+
+```js
+check(references, object);
+```
+
+#### Arguments
+
+- ##### references\<[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)>
+  The references argument is an array of strings containing type & instance names.
+- ##### object\<Any>
+  The object to be checked.
+
+#### Examples
+
+Since, `references` argument has a fixed type [`Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array). The function will throw [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError) for invalid types.
 
 ```js
 const { check } = require("typemon");
 
-check(); // Throws TypeError since "refs" value which is array of string values or references is compulsory here
-
-check([]); // returns true since "val" arg is undefined & [] is resolved to ["undefined"]
-check([], ""); // returns false
-
-// Make custom function for convenience
-const ck = x => check(["null", "string", "Array"], x);
-
-ck(); // returns false
-ck(true); // returns false
-
-ck(null); // returns true
-ck(""); // returns true
-ck([]); // returns true
+try {
+  check(); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "references" argument must be an instance of Array. Received undefined
+}
 ```
 
-#### statement(arr)
+Note that the `check` function resolves empty array to [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) containing type name "undefined".
 
-This function is essential in creating dynamic "list" statement of provided types. Argument must be an array of string values. Since an array of pre-declared types is used to check common types. It resolves unknown "falsy" (undefined & null) or "type" to an "instance". Returns a string.
+```js
+const { check } = require("typemon");
+
+check(["undefined"]);
+// Same as doing below
+
+check([]); // Array becomes ["undefined"]
+```
+
+Also note that the `check` function filters out non-string or empty string values from received [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
+
+```js
+const { check } = require("typemon");
+
+check([0]); // Array becomes ["undefined"]
+check([0, "string"]); // Array becomes ["string"]
+```
+
+The examples below show the usage.
+
+```js
+const { check } = require("typemon");
+
+check(["null"]); // Returns false
+check(["string"]); // Returns false
+check(["Array"]); // Returns false
+
+// Make custom function for convenience
+const ch = x => check(["null", "string", "Array"], x);
+
+ch(); // Returns false
+ch(true); // Returns false
+ch(0); // Returns false
+
+ch(null); // Returns true
+ch(""); // Returns true
+ch([]); // Returns true
+```
+
+### statement
+
+The statement function generates dynamic type & instance statements.
+
+```js
+statement(references);
+```
+
+#### Arguments
+
+- ##### references\<[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)>
+  The references argument is an array of strings containing type & instance names.
+
+#### Examples
+
+Just like [`check`](#check) function, the `references` argument has a fixed type [`Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array). The function will throw [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError) for invalid types.
 
 ```js
 const { statement } = require("typemon");
 
-statement(); // will throw TypeError since "refs" arg is not an array
-
-statement([]); // returns "undefined"
-statement([0]); // returns "undefined"
-
-statement(["null"]); // returns "null"
-statement(["string"]); // returns "of type string"
-statement(["Array"]); // returns "an instance of Array"
+try {
+  statement(); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "references" argument must be an instance of Array. Received undefined
+}
 ```
 
-#### bindChecker(func, arg1, arg2, ..., argN)
+The examples below show the basic usage. Note that just like [`check`](#check) function `statement` function also resolves & filters out non-string or empty string values from [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
 
-This function binds a checker function on top of function passed as an argument. Arguments after "func" argument can be enumerable (arg1, arg2, ..., argN) but must be object of properties "name" and "refs" which is an array of string values. Returns bound function with name set to provided function's name.
+```js
+const { statement } = require("typemon");
+
+statement([]); // Returns "undefined"
+
+statement(["null"]); // Returns "null"
+statement(["string"]); // Returns "of type string"
+statement(["Array"]); // Returns "an instance of Array"
+
+statement(["null", "string", "Array"]);
+// Returns "null, of type string or an instance of Array"
+```
+
+### bindChecker
+
+The bindChecker function binds an anonymous function to the function passed as an argument. It uses [`check`](#check) function to match type & instance names for each argument.
+
+```js
+bindChecker(specifications, func[, callback]);
+```
+
+#### Arguments
+
+- ##### specifications\<[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)>
+  The specifications argument is an array of objects with properties `name` & `references`. Here, `name` property must be a [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) & `references` property must be an [`array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of strings containing type & instance names.
+- ##### func\<[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function)>
+  The target function.
+- ##### callback\<[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function)>
+  The callback argument is optional. An object with properties `name`, `references`, `valid` & `value` is passed as an argument. Default callback:
+
+  ```js
+  x => {
+    // Throw error if argument is of invalid type
+    if (!x.valid) {
+      throw new ERR_INVALID_ARG_TYPE(x.name, statement(x.references), x.value);
+    }
+
+    // Return argument
+    return x.value;
+  };
+  ```
+
+  [<img src="./src/assets/go_to.svg" width="16" /> ERR_INVALID_ARG_TYPE](#err_invalid_arg_type)
+
+  [<img src="./src/assets/go_to.svg" width="16" /> statement](#statement)
+
+#### Examples
+
+The arguments `specifications`, `func` & `callback` have fixed types. The function will throw [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError) for invalid types.
 
 ```js
 const { bindChecker } = require("typemon");
 
-bindChecker(); // will throw TypeError since "func" argument is undefined
+try {
+  bindChecker(); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "specifications" argument must be an instance of Array. Received undefined
+}
+```
 
-// Declare your function
-const myFunction = (x, y) => x + y;
+Since, `bindChecker` uses [`check`](#check) for each argument. Each [`object`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) from `specifications` array must contain properties `name` & `references`. Property `name` must be of type [`string`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) & `references` property must be an instance of [`Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) or the function will throw [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError).
+
+```js
+const { bindChecker } = require("typemon");
+
+try {
+  bindChecker([{}]); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "specification.name" argument must be of type string. Received undefined
+}
+```
+
+If `specifications` argument is an empty array. It resolves to array containing [`object`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) with properties `name` & `references` with values set to empty string and empty array.
+
+```js
+const { bindChecker } = require("typemon");
+
+const specs = [
+  { name: "", references: [] }
+];
+
+bindChecker(specs, () => {})(); // Returns undefined
+bindChecker([], () => {})(); // Returns undefined
+```
+
+The examples below show the basic usage.
+
+```js
+const { bindChecker } = require("typemon");
 
 // Declare specifications
 const specs = [
-  { name: "x", refs: ["number"] },
-  { name: "y", refs: ["number"] }
+  { name: "x", references: ["number"] },
+  { name: "y", references: ["number"] }
 ];
 
-// Declare bound function (optional)
-const boundFunction = bindChecker(myFunction, ...specs);
+const sum = bindChecker(specs, (x, y) => x + y);
 
-boundFunction(2, 3); // returns 5
-boundFunction(null, 3);
-// Throws TypeError since "x" argument has specification of a number but received null object
+try {
+  sum(2, 3); // Returns 5
+  sum(null, 3); // Throws an error
+} catch (err) {
+  console.log(err + "");
+  // TypeError [ERR_INVALID_ARG_TYPE]: The "x" argument must be of type number. Received null
+}
+```
+
+The `bindChecker` function also offers a `callback`.
+
+```js
+const { bindChecker } = require("typemon");
+
+// Declare specifications
+const specs = [
+  { name: "str", references: ["string"] }
+];
+
+// Declare function
+const example = bindChecker(specs, str => str.toLowerCase(), console.log);
+
+example("HELLO WORLD!"); // Returns "hello world!"
+/* Logs
+ {
+  name: 'str',
+  references: ['string'],
+  valid: true
+  value: 'HELLO WORLD!'
+ } */
+```
+
+You can alter the default `callback` & prevent it from throwing error.
+
+```js
+const { bindChecker } = require("typemon");
+
+// Declare callback function
+const resolveToNumber = x => typeof x.value === "number" ? x.value : 0;
+
+// Declare function
+const example = bindChecker([], x => x + 1, resolveToNumber);
+
+example(); // Returns 1
+example(""); // Returns 1
+example(1); // Returns 2
 ```
 
 ### License
@@ -156,3 +446,4 @@ Refer to [LICENSE](LICENSE) file
 ### Quick Links
 
 - [GitHub Repository](https://github.com/PantheraRed/typemon.git)
+- [NPM](https://www.npmjs.com/package/typemon)
