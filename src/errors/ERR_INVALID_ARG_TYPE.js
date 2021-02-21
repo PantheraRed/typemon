@@ -1,30 +1,33 @@
 "use strict";
 
-const { inspect } = require("util");
+const whatis = require("../utils/whatis"); // Import whatis function from utils directory
 
+// Declare default callback
+const def = x => whatis(x);
+
+// Extend Error class
 class ERR_INVALID_ARG_TYPE extends Error {
-  constructor(arg, type, obj, cb = x => x) {
-    if (typeof cb !== "function") {
-      arg = "cb";
-      type = "of type function";
-      obj = cb;
-      cb = x => x;
+  constructor(name, st, obj, cb = def) {
+    // Declare reset function
+    const reset = (o, n, s, c) => {
+      obj = o; name = n; st = s; cb = c;
+    };
+    // Change value of arguments if any argument is of invalid type
+    if (typeof name !== "string") {
+      reset(name, "name", "of type string", def);
+    } else if (typeof st !== "string") {
+      reset(st, "statement", "of type string", def);
+    } else if (typeof cb !== "function") {
+      reset(cb, "callback", "of type function", def);
     }
 
-    if (obj === undefined || obj === null) {
-      obj = obj + "";
-    } else if (typeof obj === "object") {
-      obj = "an instance of " + obj.constructor.name;
-    } else if (typeof obj === "function") {
-      obj = `type function (${obj.name ? obj.name : "anonymous"})`;
-    } else {
-      obj = `type ${typeof obj} (${inspect(obj)})`;
-    }
-
-    super(`The "${arg}" argument must be ${type}. Received ${cb(obj)}`);
+    // Generate error message
+    super(`The "${name}" argument must be ${st}. Received ${cb(obj)}`);
   }
 
+  // Change constructor's name
   name = `TypeError [${this.constructor.name}]`;
 }
 
+// Export class ERR_INVALID_ARG_TYPE
 module.exports = ERR_INVALID_ARG_TYPE;

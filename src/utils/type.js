@@ -1,3 +1,4 @@
 "use strict";
 
-module.exports = obj => obj === null ? "null" : typeof obj;
+// Resolve type for object "null" & export type function
+module.exports = x => x === null ? "null" : typeof x;
