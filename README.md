@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-    <a href="https://www.npmjs.com/package/typemon"><img src="./src/assets/logo.svg" width="500" alt="typemon" /></a>
+    <a href="https://www.npmjs.com/package/typemon"><img src="https://user-images.githubusercontent.com/41539361/114969021-23a0f980-9e95-11eb-9d15-5aaf625078ad.png" width="500" alt="typemon" /></a>
   </p>
   <p>
     <a href="https://www.npmjs.com/package/typemon"><img src="https://img.shields.io/npm/v/typemon.svg?maxAge=3600" alt="npm version" /></a>
